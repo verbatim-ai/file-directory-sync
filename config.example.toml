@@ -1,0 +1,117 @@
+# Verbatim AI — file directory sync configuration.
+#
+# Pass this file to the job:  verbatim-sync --config /etc/verbatim/sync.toml
+#
+# Every relative path below is resolved against THIS FILE's directory, not the
+# process working directory — cron does not control the latter.
+
+[source]
+# Directory tree to synchronise. Walked recursively.
+root_dir = "/data/documents"
+
+# Symlinks are not followed by default: following them can walk out of the tree
+# and can loop. Enable only if the tree deliberately links content in.
+follow_symlinks = false
+
+# Optional allowlist of glob patterns, matched against the path relative to
+# root_dir. When empty, every file is a candidate (still subject to [filters]).
+include = ["**/*.pdf"]
+
+# Patterns excluded before anything else. A directory matching an exclude
+# pattern is not descended into at all.
+exclude = ["**/.*", "**/~$*", "**/*.tmp", "**/*.part"]
+
+
+[corpus]
+# UID of the target corpus on the platform (UUIDv4).
+id = "550e8400-e29b-41d4-a716-446655440001"
+
+# ISO-639 language passed to the platform for summarisation.
+lang = "fr"
+
+# Free-form label stored on each document, identifying this job as the source.
+provider = "file-directory-sync"
+
+
+[filters]
+# MIME types accepted by this job. A file resolving to anything else is skipped
+# and logged. Checked against GET /v1/doc/accept by `verbatim-sync --check`.
+content_types = ["application/pdf"]
+
+# Size bounds. SI suffixes are powers of 10 (MB = 1_000_000), IEC suffixes are
+# powers of 2 (MiB = 1_048_576). A bare integer is a byte count.
+max_file_size = "50MB"
+min_file_size = "1B"
+
+
+[api]
+# Production: https://api.verbatim-ai.com
+# Staging:    https://staging-api.verbatim-ai.com
+base_url = "https://api.verbatim-ai.com"
+
+# Your organisation UUID. Signed into every token as the `oid` claim.
+organization_id = "66666666-7777-8888-9999-000000000000"
+
+# Directory holding the RSA key pair, kept outside the project.
+#
+#   python build_keys.py --gen-keys --key-id <uuid>
+#     keys/<uuid>       private key — chmod 600, never leaves this server
+#     keys/<uuid>.pub   public key — paste into https://app.verbatim-ai.com > Keys
+#
+# ⚠️  The private key is a credential. Never commit it.
+keys_dir = "/etc/verbatim/keys"
+
+# Filename of the PRIVATE key inside keys_dir. Any name will do — "staging",
+# "prod.pem", or the UUID that build_keys.py uses. The public half is looked
+# for beside it as <name>.pub (or <stem>.pub).
+key_filename = "11111111-2222-3333-4444-555555555555"
+
+# The key's UUID as issued by the platform, sent as the JWT `kid` header so the
+# server knows which public key to verify with. Independent of key_filename:
+# find it on the key's detail page in the backoffice.
+key_id = "11111111-2222-3333-4444-555555555555"
+
+# Per-request timeout in milliseconds. Applies to the JSON API calls; the
+# engine uses a longer one when pushing file bytes to storage.
+timeout_ms = 5000
+
+max_retries = 5
+
+# Lifetime of each signed JWT. The docs advise minutes to an hour.
+token_ttl_minutes = 30
+
+
+[database]
+# Local SQLite state: maps each local file to its document UID in the corpus.
+# Losing this file means the next run cannot tell what is already synced.
+path = "./state/sync.db"
+
+
+[logging]
+level = "INFO"
+file = "./logs/sync.log"
+console = true
+
+# "text" for humans, "json" for one structured object per line.
+format = "text"
+
+rotate_max_bytes = "10MiB"
+backup_count = 7
+
+
+[sync]
+# How many files to process at once. Each worker takes one file through the
+# whole init -> upload -> commit -> poll flow, so the run is bounded by network
+# latency rather than by any single file. The platform rate-limits, and 429s
+# are retried with backoff; raising this past a few dozen rarely helps.
+threads = 5
+
+# Report what would change without touching the corpus.
+dry_run = false
+
+# Delete the document from the corpus when its local file disappears.
+delete_remote_when_missing = true
+
+# Poll GET /v1/doc/{id}/status after commit until READY or FAILED.
+poll_status = true
+poll_timeout_seconds = 300
