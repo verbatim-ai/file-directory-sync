@@ -6,7 +6,7 @@ The job runs from cron or by hand, always with a configuration file as its sole
 argument. A local SQLite database holds the mapping between each local file and
 the UID of the document it became in the corpus.
 
-📖 **[User Guide](docs/USER_GUIDE.md)** — installation, configuration reference,
+📖 **[User Guide](USER_GUIDE.md)** — installation, configuration reference,
 every command option, cron setup, monitoring and troubleshooting. This README is
 the short version.
 
@@ -29,7 +29,7 @@ uv sync
 
 ## Configure
 
-Copy `config.example.toml` and edit it. Every relative path in the file is
+Copy `config.example.toml` ([file here](https://github.com/verbatim-ai/file-directory-sync/blob/main/config.example.toml)) and edit it. Every relative path in the file is
 resolved against the file's own directory, so cron's working directory does not
 matter.
 

@@ -1,4 +1,4 @@
-# File Directory Sync — User Guide
+# User Guide
 
 This guide covers everything needed to install, configure and run the job that
 mirrors a local directory tree into a [Verbatim AI](https://www.verbatim-ai.com)
@@ -61,7 +61,7 @@ rotate and are capped by `logging.rotate_max_bytes` × `logging.backup_count`.
 ## 3. Installation
 
 ```shell
-git clone <this repository> /opt/file-directory-sync
+git clone https://github.com/verbatim-ai/file-directory-sync.git /opt/file-directory-sync
 cd /opt/file-directory-sync
 uv sync
 ```
