@@ -4,19 +4,6 @@ This guide covers everything needed to install, configure and run the job that
 mirrors a local directory tree into a [Verbatim AI](https://www.verbatim-ai.com)
 corpus.
 
-- [1. What the job does](#1-what-the-job-does)
-- [2. Requirements](#2-requirements)
-- [3. Installation](#3-installation)
-- [4. Before the first run](#4-before-the-first-run)
-- [5. Preparing the local database](#5-preparing-the-local-database)
-- [6. Running the job](#6-running-the-job)
-- [7. Command reference](#7-command-reference)
-- [8. Configuration reference](#8-configuration-reference)
-- [9. Running from cron](#9-running-from-cron)
-- [10. Monitoring](#10-monitoring)
-- [11. Recovering the local database](#11-recovering-the-local-database)
-- [12. Troubleshooting](#12-troubleshooting)
-
 ---
 
 ## 1. What the job does
