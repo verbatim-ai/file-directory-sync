@@ -1,4 +1,4 @@
-# File Directory Sync
+# Read Me
 
 Sync a local directory tree into a [Verbatim AI](https://www.verbatim-ai.com) corpus.
 
