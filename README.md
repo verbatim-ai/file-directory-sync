@@ -2,6 +2,8 @@
 
 Sync a local directory tree into a [Verbatim AI](https://www.verbatim-ai.com) corpus.
 
+<img src="assets/fds.webp">
+
 The job runs from cron or by hand, always with a configuration file as its sole
 argument. A local SQLite database holds the mapping between each local file and
 the UID of the document it became in the corpus.
