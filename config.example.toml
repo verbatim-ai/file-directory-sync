@@ -73,13 +73,12 @@ key_id = "11111111-2222-3333-4444-555555555555"
 
 # Per-request timeout in milliseconds. Applies to the JSON API calls; the
 # engine uses a longer one when pushing file bytes to storage.
-timeout_ms = 5000
+timeout_ms = 60000
 
 max_retries = 5
 
 # Lifetime of each signed JWT. The docs advise minutes to an hour.
 token_ttl_minutes = 30
-
 
 [database]
 # Local SQLite state: maps each local file to its document UID in the corpus.
