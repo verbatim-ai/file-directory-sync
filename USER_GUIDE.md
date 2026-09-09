@@ -110,7 +110,6 @@ chmod 600 /etc/verbatim/keys/prod
 The key name  is yours to choose. Key ID is assigned by the platform — see `key_filename` vs `key_id` in §8.4.
 
 ### 4.2 Get the corpus ID
-
 Create or open the target corpus in the backoffice and copy its UUID. The job
 never creates a corpus; it only pushes documents into one that already exists. 
 The ID is visible in the header of your Corpus , in your Verbatim AI console
@@ -118,7 +117,7 @@ The ID is visible in the header of your Corpus , in your Verbatim AI console
 ### 4.3 Get the Key ID
 Register your key in your Verbatim AI console.
 The ID is visible in the header of your Key , in your Verbatim AI console
-([documentation](https://verbatim-ai.gitbook.io/docs/integration/rsa-keys))
+([documentation](https://verbatim-ai.gitbook.io/docs/api-keys))
 
 ### 4.4 Write the configuration file
 
