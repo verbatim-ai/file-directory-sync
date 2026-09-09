@@ -113,5 +113,5 @@ dry_run = false
 delete_remote_when_missing = true
 
 # Poll GET /v1/doc/{id}/status after commit until READY or FAILED.
-poll_status = true
+poll_status = false
 poll_timeout_seconds = 300
