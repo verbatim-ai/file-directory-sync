@@ -78,15 +78,15 @@ key. Generate the pair with the platform's `build_keys.py`
 ```shell
 mkdir -p /etc/verbatim/keys
 python build_keys.py --gen-keys \
-    --key-id "$(uuidgen | tr 'A-Z' 'a-z')" \
+    --key-name "your-key-name" \
     --keys-dir /etc/verbatim/keys
 ```
 
 That writes two files:
 
 ```
-/etc/verbatim/keys/<uuid>       private key, mode 600 — never leaves this server
-/etc/verbatim/keys/<uuid>.pub   public key
+/etc/verbatim/keys/<your-key-name>       private key, mode 600 — never leaves this server
+/etc/verbatim/keys/<your-key-name>.pub   public key
 ```
 
 Open <https://app.verbatim-ai.com> → **Keys**, create a new key, and paste in
@@ -107,14 +107,20 @@ openssl rsa -in /etc/verbatim/keys/prod -pubout -out /etc/verbatim/keys/prod.pub
 chmod 600 /etc/verbatim/keys/prod
 ```
 
-The filename is yours to choose — see `key_filename` vs `key_id` in §8.4.
+The key name  is yours to choose. Key ID is assigned by the platform — see `key_filename` vs `key_id` in §8.4.
 
-### 4.2 Get the corpus UID
+### 4.2 Get the corpus ID
 
 Create or open the target corpus in the backoffice and copy its UUID. The job
-never creates a corpus; it only pushes documents into one that already exists.
+never creates a corpus; it only pushes documents into one that already exists. 
+The ID is visible in the header of your Corpus , in your Verbatim AI console
 
-### 4.3 Write the configuration file
+### 4.3 Get the Key ID
+Register your key in your Verbatim AI console.
+The ID is visible in the header of your Key , in your Verbatim AI console
+([documentation](https://verbatim-ai.gitbook.io/docs/integration/rsa-keys))
+
+### 4.4 Write the configuration file
 
 Start from the shipped example:
 
@@ -135,7 +141,7 @@ id = "550e8400-e29b-41d4-a716-446655440001"
 [api]
 organization_id = "66666666-7777-8888-9999-000000000000"
 keys_dir        = "/etc/verbatim/keys"
-key_filename    = "20c5ff08-c1f3-464b-be32-cf87be5da7ef"
+key_filename    = "your-key-name"
 key_id          = "20c5ff08-c1f3-464b-be32-cf87be5da7ef"
 ```
 
@@ -143,7 +149,7 @@ Every relative path in the file is resolved **against the configuration file's
 own directory**, never the working directory — cron does not control the
 latter. §8 documents every option.
 
-### 4.4 Verify it
+### 4.5 Verify it
 
 ```shell
 uv run verbatim-sync --config /etc/verbatim/sync.toml --check
