@@ -1,0 +1,67 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Verbatim File Directory Sync",
+  "description": "Open-source Python CLI that keeps a local directory tree in sync with a Verbatim AI corpus, the secure, GDPR-compliant RAG platform to chat with your documents.",
+  "colors": {
+    "primary": "#ff4081",
+    "light": "#ff79a8",
+    "dark": "#c2185b"
+  },
+  "favicon": "/assets/favicon.svg",
+  "navigation": {
+    "groups": [
+      {
+        "group": "Get started",
+        "pages": ["README", "USER_GUIDE"]
+      },
+      {
+        "group": "Releases",
+        "pages": ["CHANGELOG"]
+      }
+    ],
+    "global": {
+      "anchors": [
+        {
+          "anchor": "Verbatim AI",
+          "icon": "globe",
+          "href": "https://www.verbatim-ai.com"
+        },
+        {
+          "anchor": "API reference",
+          "icon": "code",
+          "href": "https://www.verbatim-ai.com/api-docs/"
+        },
+        {
+          "anchor": "API status",
+          "icon": "signal",
+          "href": "https://verbatim-ai.openstatus.dev"
+        }
+      ]
+    }
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Platform docs",
+        "href": "https://verbatim-ai.gitbook.io/docs"
+      }
+    ],
+    "primary": {
+      "type": "github",
+      "href": "https://github.com/verbatim-ai/file-directory-sync"
+    }
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/verbatim-ai",
+      "linkedin": "https://www.linkedin.com/company/verbatim-ai/",
+      "website": "https://www.verbatim-ai.com"
+    }
+  },
+  "seo": {
+    "metatags": {
+      "keywords": "Verbatim AI, RAG, document sync, directory sync, knowledge base, document ingestion, cron, Python CLI, GDPR"
+    }
+  }
+}
