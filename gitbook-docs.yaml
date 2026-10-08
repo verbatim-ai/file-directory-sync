@@ -1,0 +1,20 @@
+$schema: https://api.gitbook.com/gitbook-docs.yaml
+# Site-wide Git Sync configuration. Maps the GitBook site onto this repository.
+#
+# The single English space reads the repository root; .gitbook.yaml beside this
+# file points it at README.md and SUMMARY.md. Only the pages listed in
+# SUMMARY.md are published.
+#
+# `key` is how Git Sync recognises the space between syncs: once the site is
+# live, never change it. Rename with `title`, move the URL with `path`.
+site:
+  title: Verbatim File Directory Sync
+  structure:
+    - type: space
+      key: file-directory-sync
+      title: File Directory Sync
+      path: file-directory-sync
+      default: true
+      content:
+        directory: ./
+        language: en
