@@ -1,16 +1,119 @@
-# Read Me
+# Verbatim File Directory Sync
 
-Sync a local directory tree into a [Verbatim AI](https://www.verbatim-ai.com) corpus.
+**Keep a local folder, file share or document archive continuously in sync with a
+[Verbatim AI](https://www.verbatim-ai.com) knowledge base, and chat with your
+documents through a secure, GDPR-compliant RAG platform.**
 
-<img src="assets/fds.webp">
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
+[![uv](https://img.shields.io/badge/packaged%20with-uv-6340ac.svg)](https://docs.astral.sh/uv/)
+[![Verbatim AI](https://img.shields.io/badge/Verbatim%20AI-API%20v1-0b7285.svg)](https://www.verbatim-ai.com/api-docs/)
+[![API status](https://img.shields.io/badge/API-status-success.svg)](https://verbatim-ai.openstatus.dev)
 
-The job runs from cron or by hand, always with a configuration file as its sole
-argument. A local SQLite database holds the mapping between each local file and
-the UID of the document it became in the corpus.
+`verbatim-sync` is an open-source Python command-line tool for one-way
+**document synchronisation** into a Verbatim AI *corpus*. Point it at a
+directory tree and it uploads new files, replaces changed ones, removes deleted
+ones and resumes interrupted transfers. Run it from **cron** or by hand. Once
+your PDFs, Word documents, spreadsheets and other files are in the corpus,
+Verbatim AI indexes them for **retrieval-augmented generation (RAG)**, so your
+team can ask questions and get answers grounded in your own content.
 
-📖 **[User Guide](USER_GUIDE.md)** — installation, configuration reference,
-every command option, cron setup, monitoring and troubleshooting. This README is
-the short version.
+<img src="assets/fds.webp" alt="Verbatim File Directory Sync: a local directory tree synchronised into a Verbatim AI corpus">
+
+📖 **[User Guide](USER_GUIDE.md)** covers installation, the configuration
+reference, every command option, cron setup, monitoring and troubleshooting.
+This README is the short version.
+
+**Contents:** [Features](#features) ·
+[About Verbatim AI](#about-verbatim-ai) ·
+[The Verbatim AI API](#the-verbatim-ai-api) · [Install](#install) ·
+[Configure](#configure) · [Run](#run) · [How it works](#how-it-works) ·
+[Related projects](#related-projects)
+
+## Features
+
+- **Incremental sync.** Only new or changed files are sent. Changes are
+  detected by SHA-256 content hash, not by modification time alone.
+- **Replace in place.** An updated file keeps the same document UID in the
+  corpus, so links and references to it stay valid.
+- **Resumable uploads.** A local state machine follows the platform's
+  init → upload → commit flow, so an interrupted run picks up where it stopped.
+- **Safe by default.** `--dry-run` previews every change. A file that only
+  falls outside the filters is never deleted.
+- **Self-healing state.** The corpus backs up the local SQLite database:
+  `--rebuild-db` restores the file-to-document mapping after a loss.
+- **Built for unattended jobs.** One TOML config per job, strict validation,
+  exit codes cron can act on, rotating logs with credentials redacted, and
+  optional JSON log output.
+- **Parallel transfers.** A configurable thread pool uploads several files at
+  once without changing the result.
+- **Filters.** Choose files by include/exclude glob patterns, content type,
+  and minimum and maximum size.
+
+Typical uses: feeding a shared drive, NAS or exported document archive into an
+AI assistant; keeping a knowledge base current with an internal wiki export;
+ingesting scanned reports, contracts, procedures or technical documentation for
+semantic search and question answering.
+
+## About Verbatim AI
+
+[Verbatim AI](https://www.verbatim-ai.com) is a French generative-AI platform
+that lets businesses **chat with their data**. It is an AI-powered answer engine
+that you connect to your files to get precise, sourced answers, with secure,
+reliable and customised agents that fit into your processes.
+
+- **RAG answer engine.** Documents are converted, summarised, chunked and
+  embedded. Every answer cites the passages it was built from.
+- **Many formats.** Multimedia files, OCR for scanned documents, and Markdown
+  conversion of the original files.
+- **Connectors and integrations.** Mail, Drive, SharePoint and Atlassian
+  sources; Microsoft Teams and Slack; an embeddable chatbot widget; and an
+  MCP server for AI assistants.
+- **Use cases.** Knowledge management, document analysis and synthesis, team
+  collaboration and everyday task assistance.
+
+### Our values
+
+- **Your data stays yours.** It is not shared, and it is **never used to train
+  AI models**. Privacy is our top priority.
+- **Security by design.** A secured RAG architecture with encryption throughout,
+  strict per-organisation tenancy, and short-lived scoped credentials.
+- **European compliance.** GDPR-compliant and aligned with the EU **AI Act**.
+- **A French company** 🇫🇷, a member of French Tech Alps (Grenoble).
+
+👉 [Get started for free](https://app.verbatim-ai.com) ·
+[Book a demo](https://meetings-eu1.hubspot.com/veyret) ·
+[Documentation](https://verbatim-ai.gitbook.io/docs) ·
+[LinkedIn](https://www.linkedin.com/company/verbatim-ai/)
+
+## The Verbatim AI API
+
+Everything this tool does goes through the public Verbatim AI REST API, which
+is plain HTTPS and JSON. You can call the same API from your own code.
+
+| Concept | Description |
+|---|---|
+| **Organization** | The top-level tenant. Each token belongs to exactly one organization, and all data is scoped to it. |
+| **Corpus** | A knowledge base that holds documents and sessions. This tool syncs one directory into one corpus. |
+| **Document** | A file ingested into a corpus. Ingestion is asynchronous: convert → summarise → chunk → embed. |
+| **Session** | A conversation thread over one or more corpora. |
+| **Post** | A single question or answer in a session. Answers carry the document chunks used as context. |
+
+The API is organised into domains under `/v1/`: `auth`, `config`, `corpus`,
+`doc`, `chunk`, `session`, `post`, `agent` and `usage`. Server-to-server calls
+like this tool's authenticate with an **RS512 JWT** signed with your RSA private
+key. Browsers and widgets use short-lived, scoped **access tokens**. Verbatim AI
+is also a **[Model Context Protocol (MCP)](https://modelcontextprotocol.io)
+server**, so assistants such as Claude or Cursor can query your corpora directly.
+
+| Resource | Link |
+|---|---|
+| API documentation | <https://www.verbatim-ai.com/api-docs/> |
+| Swagger playground | <https://www.verbatim-ai.com/api-docs/swagger/> |
+| OpenAPI specification (JSON) | <https://www.verbatim-ai.com/api-docs/openapi.json> |
+| API status | <https://verbatim-ai.openstatus.dev> |
+| Production base URL | `https://api.verbatim-ai.com` |
+| Staging base URL | `https://staging-api.verbatim-ai.com` |
+| Backoffice | <https://app.verbatim-ai.com> |
 
 ## Status
 
@@ -47,7 +150,8 @@ accepted content types and the size bounds, plus where to keep state and logs.
 Authentication uses an RS512 JWT signed with your RSA private key
 ([docs](https://verbatim-ai.gitbook.io/docs/integration/rsa-keys)).
 
-1. Generate a key pair with the platform's `build_keys.py`:
+1. Generate a key pair with the platform's `build_keys.py`, from
+   [`python-token-builder`](https://github.com/verbatim-ai/python-token-builder):
 
    ```shell
    python build_keys.py --gen-keys --key-id $(uuidgen | tr 'A-Z' 'a-z') \
@@ -275,3 +379,27 @@ No test touches the network. The HTTP layer is exercised through
 against the OpenAPI spec, and the sync engine runs against an in-memory backend
 that models the real contract — bytes must be PUT before commit, duplicate
 content is rejected, and re-init only works from `READY` or `FAILED`.
+
+## Related projects
+
+Every tool and SDK published for Verbatim AI integrators lives in the
+[Verbatim AI GitHub organization](https://github.com/verbatim-ai?tab=repositories):
+
+| Repository | Language | What it is |
+|---|---|---|
+| [`python-client`](https://github.com/verbatim-ai/python-client) | Python | Generated SDK for the REST API |
+| [`typescript-node-client`](https://github.com/verbatim-ai/typescript-node-client) | TypeScript | Generated SDK for the REST API |
+| [`java-spring-rest-client`](https://github.com/verbatim-ai/java-spring-rest-client) | Java | Generated SDK (Spring `RestTemplate`) |
+| [`java-resteasy-client`](https://github.com/verbatim-ai/java-resteasy-client) | Java | Generated SDK (JAX-RS / RESTEasy) |
+| [`python-token-builder`](https://github.com/verbatim-ai/python-token-builder) | Python | Generate RSA key pairs and mint JWTs |
+| [`client-demo`](https://github.com/verbatim-ai/client-demo) | Mixed | End-to-end REST client examples |
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md).
+
+## Support
+
+Questions, bugs or feature requests: open an
+[issue](https://github.com/verbatim-ai/file-directory-sync/issues) or
+[contact Verbatim AI](https://www.verbatim-ai.com/contact).
